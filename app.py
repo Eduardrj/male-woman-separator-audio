@@ -13,6 +13,13 @@ pipeline = Pipeline.from_pretrained(
 
 def diarize(audio):
     data, sr = audio
+        import numpy as np
+    if not isinstance(data, np.ndarray):
+        data = np.array(data)
+
+        if data.ndim == 1:
+        data = data[:, None]
+
     with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
         sf.write(tmp.name, data, sr)
         tmp_path = tmp.name
