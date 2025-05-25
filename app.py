@@ -14,7 +14,7 @@ pipeline = Pipeline.from_pretrained(
 
 def diarize(audio):
     ata, sr = audio
-          if not isinstance(data, np.ndarray):
+              if not isinstance(data, np.ndarray):
         data = np.array(data)
 
         if data.ndim == 1:
