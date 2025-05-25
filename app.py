@@ -3,6 +3,7 @@ import gradio as gr
 from pydub import AudioSegment
 from pyannote.audio import Pipeline
 import soundfile as sf
+import numpy as np
 
 HF_TOKEN = os.getenv("HF_TOKEN")
 
@@ -13,8 +14,7 @@ pipeline = Pipeline.from_pretrained(
 
 def diarize(audio):
     data, sr = audio
-        import numpy as np
-    if not isinstance(data, np.ndarray):
+            if not isinstance(data, np.ndarray):
         data = np.array(data)
 
         if data.ndim == 1:
