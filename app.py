@@ -13,7 +13,7 @@ pipeline = Pipeline.from_pretrained(
 )
 
 def diarize(audio):
-    data, sr = audio
+    ata, sr = audio
            if not isinstance(data, np.ndarray):
         data = np.array(data)
 
