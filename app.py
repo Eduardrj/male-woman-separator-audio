@@ -4,10 +4,26 @@ import soundfile as sf
 import gradio as gr
 from pyannote.audio import Pipeline
 from pydub import AudioSegment
+import os
 
-pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization")
+# Carrega o token de uma variável de ambiente (no Hugging Face Spaces, isso vem automaticamente)
+auth_token = os.getenv("HUGGINGFACE_TOKEN")
+
+if not auth_token:
+    raise ValueError("Token de autenticação não encontrado. Certifique-se de adicionar o segredo 'HUGGINGFACE_TOKEN' nas configurações do seu espaço.")
+
+try:
+    # Tenta carregar o pipeline com o token de autenticação
+    pipeline = Pipeline.from_pretrained("pyannote/speaker-diarization", use_auth_token=auth_token)
+    print("Pipeline carregado com sucesso!")
+except Exception as e:
+    print(f"Erro ao carregar o pipeline: {e}")
 
 def diarize(audio):
+    # Verifica se o pipeline foi carregado corretamente
+    if not pipeline:
+        raise ValueError("O pipeline não foi carregado corretamente. Verifique sua autenticação ou o modelo.")
+    
     diarization = pipeline(audio)
 
     audio_seg = AudioSegment.from_file(audio)
@@ -33,6 +49,7 @@ def diarize(audio):
 
     return outputs
 
+# Interface Gradio
 iface = gr.Interface(
     fn=diarize,
     inputs=gr.Audio(type="filepath"),
