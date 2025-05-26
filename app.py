@@ -1,4 +1,5 @@
-import os, tempfile
+import os
+import tempfile
 import gradio as gr
 from pydub import AudioSegment
 from pyannote.audio import Pipeline
@@ -13,11 +14,12 @@ pipeline = Pipeline.from_pretrained(
 )
 
 def diarize(audio):
-    ata, sr = audio
-           if not isinstance(data, np.ndarray):
+    data, sr = audio
+
+    if not isinstance(data, np.ndarray):
         data = np.array(data)
 
-        if data.ndim == 1:
+    if data.ndim == 1:
         data = data[:, None]
 
     with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
@@ -31,7 +33,7 @@ def diarize(audio):
 
     for turn, _, speaker in diarization.itertracks(yield_label=True):
         text_out += f"{turn.start:.1f}s - {turn.end:.1f}s : {speaker}\n"
-        segment_audio = original[turn.start*1000 : turn.end*1000]
+        segment_audio = original[int(turn.start * 1000): int(turn.end * 1000)]
         segments.setdefault(speaker, AudioSegment.empty())
         segments[speaker] += segment_audio
 
@@ -42,7 +44,6 @@ def diarize(audio):
         files.append(out_path)
 
     return text_out, files
-
 
 demo = gr.Interface(
     diarize,
