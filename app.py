@@ -22,11 +22,9 @@ def diarize(audio):
     data = np.asarray(data)
 
     if data.ndim == 1:
-        # Mono: adiciona dimensão de canal
         data = data[:, np.newaxis]
     elif data.ndim == 2:
         if data.shape[1] == 2:
-            # Estéreo: converte para mono
             data = np.mean(data, axis=1, keepdims=True)
         elif data.shape[1] > 2:
             raise ValueError("O áudio tem mais de 2 canais. Use áudio mono ou estéreo.")
@@ -46,24 +44,31 @@ def diarize(audio):
         segments.setdefault(speaker, AudioSegment.empty())
         segments[speaker] += segment_audio
 
-    files = []
+    audio_outputs = []
     for spk, audio_seg in segments.items():
         out_path = f"/tmp/{spk}.wav"
         audio_seg.export(out_path, format="wav")
-        files.append(out_path)
+        audio_outputs.append((f"Locutor {spk}", out_path))
 
-    return text_out, files
+    return text_out, audio_outputs
 
-demo = gr.Interface(
-    diarize,
-    inputs=gr.Audio(type="numpy", label="Upload áudio"),
-    outputs=[
-        gr.Textbox(label="Anotações"),
-        gr.Files(label="Arquivos por locutor")
-    ],
-    title="Separação Voz Masculina/Feminina",
-    description="Identifica locutores e gera um arquivo para cada um."
-)
+def create_demo():
+    audio_outputs = []
+    for i in range(5):  # até 5 locutores (ajustável)
+        audio_outputs.append(gr.Audio(label=f"Locutor {i}", visible=False))
+
+    return gr.Interface(
+        diarize,
+        inputs=gr.Audio(type="numpy", label="Upload áudio"),
+        outputs=[
+            gr.Textbox(label="Anotações"),
+            *audio_outputs
+        ],
+        title="Separação Voz Masculina/Feminina",
+        description="Identifica locutores e gera um player de áudio para cada um."
+    )
+
+demo = create_demo()
 
 if __name__ == "__main__":
     demo.launch()
