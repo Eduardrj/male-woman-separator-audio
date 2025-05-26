@@ -16,16 +16,20 @@ pipeline = Pipeline.from_pretrained(
 def diarize(audio):
     data, sr = audio
 
-    if data is None:
+    if data is None or sr is None:
         raise ValueError("Áudio inválido ou não foi carregado corretamente.")
 
-    data = np.array(data)
+    data = np.asarray(data)
 
-    # Garante formato (samples, channels)
     if data.ndim == 1:
-        data = data.reshape(-1, 1)
-    elif data.ndim > 2:
-        raise ValueError("O áudio tem mais de 2 dimensões, o que não é esperado.")
+        # Mono: adiciona dimensão de canal
+        data = data[:, np.newaxis]
+    elif data.ndim == 2:
+        if data.shape[1] == 2:
+            # Estéreo: converte para mono
+            data = np.mean(data, axis=1, keepdims=True)
+        elif data.shape[1] > 2:
+            raise ValueError("O áudio tem mais de 2 canais. Use áudio mono ou estéreo.")
 
     with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
         sf.write(tmp.name, data, sr)
