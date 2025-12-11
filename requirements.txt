@@ -1,6 +1,7 @@
-gradio>=3.0,<4
-torch>=2.0
-torchaudio
+gradio==5.31.0
+# Pin torch/torchaudio to versions compatible with pyannote.audio 3.1.1
+torch==1.13.1
+torchaudio==0.13.1
 pyannote.audio==3.1.1
 pydub
 soundfile

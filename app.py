@@ -1,4 +1,17 @@
 import gradio as gr
+# Compat: torchaudio API change (set_audio_backend removed in newer versions)
+try:
+    import torchaudio  # noqa: F401
+    if not hasattr(torchaudio, "set_audio_backend"):
+        def _noop_set_audio_backend(_name: str):
+            # Newer torchaudio uses default backends and no longer exposes this setter.
+            # Pyannote 3.x calls this; a no-op preserves compatibility.
+            return None
+        setattr(torchaudio, "set_audio_backend", _noop_set_audio_backend)
+except Exception:
+    # If torchaudio is unavailable, pyannote may still work via soundfile fallback.
+    pass
+
 from pyannote.audio import Pipeline
 from pydub import AudioSegment
 import os
