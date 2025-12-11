@@ -13,7 +13,7 @@ jobs:
           lfs: true
       - name: Push to Space
         env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_TOKEN: ${{ hf_NHKrdSMVJwsGkqSjdzUTcWCXFsyRsgRq1A }}
         run: |
           git remote add space https://Eduardrj:$HF_TOKEN@huggingface.co/spaces/Eduardrj/male-woman-separator-audio
           git push --force space main
